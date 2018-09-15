@@ -1,0 +1,75 @@
+
+# Rust 1.12 est désormais disponible :
+## Design des erreurs revu, renvoi de la trace au format json et implémentation de la génération de code MIR
+
+// 10 Octobre 2016
+
+La dernière version en date de Rust (1.12) a été annoncée sur le blog officiel de l'équipe le 29 septembre dernier, apportant par la même occasion son lot de nouveautés.
+
+![Logo de rust](pas de lien)
+
+## Quelles sont les nouvelles ?
+De gros efforts ont été fournis sur le compilateur ainsi que les informations qu'il partage avec les développeurs pour rendre ces dernières plus intelligibles et ainsi faciliter le débogage des projets.
+
+## Design des erreurs revu
+
+Jusqu'ici, les messages renvoyés par le compilateur (bien que très explicites et verbeux) étaient assez peu intelligibles pour son lecteur, forçant très souvent le développeur à parcourir l'intégralité de la trace pour trouver les lignes incriminées.
+Bien que sur de petits projets le problème ne soit pas de taille, cela peut devenir très gênant lorsqu'un programme dispose de nombreuses assertions.
+
+Pour remarquer les différences majeures, voici quelques exemples d'erreurs fournies par les versions de rustc inférieures à **1.12**:
+
+#### <= 1.11
+
+![erreurs rust avant 1.12](jo po de lien)
+
+Formatage des erreurs par la version 1.12 de rustc:
+
+#### ^1.12
+![erreur rust](jopodelien)
+
+Bien que les anciennes traces d'erreurs étaient compréhensibles, les nouvelles conservent uniquement l'essentiel pour déboguer efficacement les éléments incriminés; Nous remarquerons également que le compilateur sollicite davantage le "soulignement" (^^^).
+
+## Renvoi de la trace au format json
+
+Il vous est désormais possible également de procéder à la génération de la trace d'erreurs au format json, vous permettant ainsi de l'utiliser comme bon vous semble. (l'auteur cite, d'ailleurs, comme exemple l'exploitation du format json par les futurs IDE dédiés à Rust)
+Pour se faire il vous suffit de passer le flag ```error-format=json``` comme ceci:
+
+[commande tirée de l'annonce officielle]
+
+Code Bash : 	Sélectionner tout
+
+```rustc borrowck-assign-comp.rs --error-format=json```
+
+Sortie standard:
+
+Code JSON :
+
+1- ```{"message":"cannot assign to `p.x` because it is borrowed","level":"error","spans":[{"file_name":"borrowck-assign-comp.rs","byte_start":562,"byte_end":563,"line_start":15,"line_end":15,"column_start":14,"column_end":15,"is_primary":false,"text":[{"text":"    let q = &p;","highlight_start":14,"highlight_end":15}],"label":"borrow of `p.x` occurs here","suggested_replacement":null,"expansion":null}],"label":"assignment to borrowed `p.x` occurs here","suggested_replacement":null,"expansion":null}],"children":[],"rendered":null}``` 
+
+2- ```{"message":"aborting due to previous error","code":null,"level":"error","spans":[],"children":[],"rendered":null}```
+
+Vous souhaiteriez en savoir davantage à ce propos ? N'hésitez pas à visiter la page "Shape of errors to come" qui présentait en avril les fonctionnalités à venir au sein du langage.
+
+## Implémentation de la génération de code MIR
+
+La seconde fonctionnalité majeure introduite dans cette nouvelle version est bien évidemment l'ajout d'un niveau d'analyse au sein du compilateur; rustc est désormais muni d'un second niveau de traduction du code source vers le code machine pour effectuer des optimisations supplémentaires avant de le convertir définitivement en binaire: la génération de code MIR(=Mid-level intermediate representation).
+
+Le sujet disposant déjà d'un document très complet s'attelant à expliquer, de manière très exhaustive, tous les rouages internes du compilateur, je vous invite à vous y rendre si le fonctionnement de rustc vous intéresse.
+
+Pour reprendre le schéma du document officiel, voici à quoi pourrait ressembler le compilateur d'aujourd'hui:
+
+![génération de code MIR](jopodelien)
+
+### Liens :
+
+- [Annonce Officiel](https://blog.rust-lang.org/2016/09/29/Rust-1.12.html)
+
+- La page [Shape Of errors to come](https://blog.rust-lang.org/2016/08/10/Shape-of-errors-to-come.html)
+
+- [Introduction au MIR](https://blog.rust-lang.org/2016/04/19/MIR.html)
+
+- [Release note](https://github.com/rust-lang/rust/blob/master/RELEASES.md#version-1120-2016-09-29)
+
+
+
+
